@@ -1,0 +1,28 @@
+{
+  "name": "bluelearn",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BlueLearn — open-source, prerequisite-graph education platform.",
+  "license": "AGPL-3.0-or-later",
+  "packageManager": "pnpm@10.33.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --aggregate-output dev",
+    "dev:app": "pnpm --filter app dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format",
+    "test": "pnpm -r test",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:reset": "supabase db reset",
+    "api:deploy": "pnpm --filter api deploy"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "workerd", "sharp"]
+  }
+}
