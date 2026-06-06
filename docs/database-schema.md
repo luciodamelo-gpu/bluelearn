@@ -287,20 +287,23 @@ Each attaches type-specific data to a `review_cases` row. `case_id` is both prim
 
 - `case_id`: PK and FK to `review_cases`.
 - `dispute_type`: `factual` |`reviewer_misconduct` | `governance` | `cross_subject`.
-- `target_type`: what the dispute is against, paired with `target_id` (polymorphic, no single FK). Allowed values depend on `dispute_type` (see table below).
-- `target_id`: the id of that target.
+- `target_guide_id`: nullable FK to `guides`. Set for `factual`.
+- `target_base_id`: nullable FK to `guide_bases`. Set for `cross_subject`.
+- `target_profile_id`: nullable FK to `profiles`. Set for `reviewer_misconduct`.
 - `claim_text`: the filer's written claim and evidence summary.
 
-What each `dispute_type` points at:
+What each `dispute_type` points at, and which arm it sets:
 
 
-| `dispute_type`        | `target_type` | Meaning                                                                            |
-| --------------------- | ------------- | ---------------------------------------------------------------------------------- |
-| `factual`             | `guide`       | A claim in a guide's content is wrong — any guide, canonical or not.               |
-| `cross_subject`       | `guide_base`  | Two subject communities conflict over one topic (may spin off).                    |
-| `reviewer_misconduct` | `profile`     | A verifier or moderator acted in bad faith, so it points at the user.              |
-| `governance`          | nullable      | A policy/process objection with no single content target; `target_id` may be null. |
+| `dispute_type`        | Target id           | Target table  | Meaning                                                                  |
+| --------------------- | ------------------- | ------------- | ------------------------------------------------------------------------ |
+| `factual`             | `target_guide_id`   | `guides`      | A claim in a guide's content is wrong.                                   |
+| `cross_subject`       | `target_base_id`    | `guide_bases` | Two subject communities conflict over one topic (may spin off).          |
+| `reviewer_misconduct` | `target_profile_id` | `profiles`    | A verifier or moderator acted in bad faith, so it points at the user.    |
+| `governance`          | *(none)*            | —             | A policy/process objection with no single content target; all arms null. |
 
+
+Adding a new disputable type later is mechanical: add one nullable FK column.
 
 A `cross_subject` dispute may resolve into a spin-off, recorded via `guide_bases.forked_from_guide_base_id`.
 
@@ -594,7 +597,7 @@ A second author adds another guide under a topic that already has a canonical gu
 A member contests content, a reviewer's conduct, a governance decision, or a cross-subject conflict.
 
 1. `review_cases` → `case_type = 'dispute'`, `created_by = filer`.
-2. `disputes` → `dispute_type`, `target_type` + `target_id` (polymorphic; allowed target depends on type — `guide`, `guide_base`, `profile`, or null for `governance`), `claim_text`.
+2. `disputes` → `dispute_type`, the matching target FK arm (`target_guide_id` for `factual`, `target_base_id` for `cross_subject`, `target_profile_id` for `reviewer_misconduct`, none for `governance`), `claim_text`.
 3. **Moderator** panel → decisions → close (flow 1 shape).
 4. **If `cross_subject` resolves into a spin-off**: `guide_bases` → insert a new subject-specific node with `forked_from_guide_base_id` = the original. The fork is an explicit, governed exception to "one canonical base per topic."
 
