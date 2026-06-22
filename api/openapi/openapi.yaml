@@ -19,7 +19,7 @@ tags:
   - name: guides
     description: Topics (guide bases) and their canonical content
   - name: variants
-    description: Methods/alternatives under a topic, plus their votes
+    description: Methods/alternatives under a topic
   - name: guide-revisions
     description: Per-guide version history snapshots
   - name: learning-paths

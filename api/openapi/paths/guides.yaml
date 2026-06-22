@@ -230,7 +230,7 @@
       example: physics-based
   get:
     tags: [guides]
-    summary: Get a variant by its slug permalink
+    summary: Get a variant by its slug
     description: >
       Resolves the base + variant slug pair to the variant and returns it with its id, so
       the client can switch to the id-based /variants/{id} routes for any
