@@ -15,5 +15,4 @@ properties:
     type: [string, 'null']
     example: |
       # Calculus
-      ...
 required: [title, knowledge_type]

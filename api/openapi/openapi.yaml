@@ -8,8 +8,7 @@ info:
   description: >
     Hono API in front of Supabase/Postgres. The frontend never talks to
     Supabase directly; every call goes through here and carries the user's
-    JWT so Postgres RLS enforces access. Some routes are declared but not
-    yet wired and currently return 501.
+    JWT so Postgres RLS enforces access.
 servers:
   - url: http://localhost:8787
     description: Local dev (pnpm dev:api)
@@ -24,9 +23,9 @@ tags:
   - name: guide-revisions
     description: Per-guide version history snapshots
   - name: learning-paths
-    description: Curated curricula (/paths)
+    description: Curated curricula
   - name: learning-path-revisions
-    description: Path version history and node editing (/path-revisions)
+    description: Path version history and node editing
   - name: graph
     description: Prerequisite edges and TODO prerequisites
   - name: subjects
@@ -56,10 +55,10 @@ paths:
     $ref: './paths/guides.yaml#/~1guides~1{slug}'
   /guides/{slug}/walkthrough:
     $ref: './paths/guides.yaml#/~1guides~1{slug}~1walkthrough'
-  /guides/{slug}/todos:
-    $ref: './paths/guides.yaml#/~1guides~1{slug}~1todos'
   /guides/{slug}/variants:
     $ref: './paths/guides.yaml#/~1guides~1{slug}~1variants'
+  /guides/{slug}/{variantSlug}:
+    $ref: './paths/guides.yaml#/~1guides~1{slug}~1{variantSlug}'
 
   /variants/{id}:
     $ref: './paths/variants.yaml#/~1variants~1{id}'

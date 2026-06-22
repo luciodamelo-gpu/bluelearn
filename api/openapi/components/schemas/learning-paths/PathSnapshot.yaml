@@ -11,7 +11,7 @@ properties:
         guide_base_id:
           $ref: '../common/Uuid.yaml'
         guide_id:
-          description: The pinned guide variant for this topic.
+          description: The pinned guide variant for this guide.
           oneOf:
             - $ref: '../common/Uuid.yaml'
             - type: 'null'

@@ -81,7 +81,7 @@ export const meRouter = new Hono<HonoEnv>()
   })
 
 export const profilesRouter = new Hono<HonoEnv>()
-  // Public profile by username + public role badges
+  // Public profile by username
   .get('/:username', async (c) => {
     const supabase = c.get('supabase')
     const username = c.req.param('username')

@@ -1,5 +1,5 @@
 type: object
-description: One included topic in a path revision.
+description: One included guide in a path revision.
 properties:
   guide_base_id:
     $ref: '../common/Uuid.yaml'

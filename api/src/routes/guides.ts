@@ -134,14 +134,14 @@ export const guidesRouter = new Hono<HonoEnv>()
   // Materialize the transitive prerequisite DAG
   .get('/:slug/walkthrough', (c) => c.json({ error: 'Not implemented' }, 501))
 
-  // Declare a TODO prerequisite
-  .post('/:slug/todos', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
-
   // Variants under this topic
   .get('/:slug/variants', (c) => c.json({ error: 'Not implemented' }, 501))
 
   // Add a new variant under this topic
   .post('/:slug/variants', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
+
+  // Resolve (base slug, variant slug) to a published variant.
+  .get('/:slug/:variantSlug', (c) => c.json({ error: 'Not implemented' }, 501))
 
 export const variantsRouter = new Hono<HonoEnv>()
   // Shows variant details: current revision content + vote tally

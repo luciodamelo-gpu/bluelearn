@@ -36,8 +36,8 @@
                         $ref: '../components/schemas/common/Uuid.yaml'
                     required: [from_id, to_id]
               required: [revision, nodes, edges]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
   patch:
     tags: [learning-path-revisions]
     summary: Overwrite a draft revision's metadata
@@ -62,8 +62,12 @@
                 revision:
                   $ref: '../components/schemas/learning-path-revisions/LearningPathRevision.yaml'
               required: [revision]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+      '400':
+        $ref: '../components/responses/_shared.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses/_shared.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
 
 /path-revisions/{id}/nodes:
   parameters:
@@ -89,11 +93,11 @@
                   items:
                     $ref: '../components/schemas/learning-path-revisions/PathNode.yaml'
               required: [nodes]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
   post:
     tags: [learning-path-revisions]
-    summary: Re-include a skipped topic as a node
+    summary: Re-include a skipped guide as a node
     operationId: addPathNode
     security:
       - bearerAuth: []
@@ -114,8 +118,12 @@
                 node:
                   $ref: '../components/schemas/learning-path-revisions/PathNode.yaml'
               required: [node]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+      '400':
+        $ref: '../components/responses/_shared.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses/_shared.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
 
 /path-revisions/{id}/nodes/{baseId}:
   parameters:
@@ -154,29 +162,26 @@
                 node:
                   $ref: '../components/schemas/learning-path-revisions/PathNode.yaml'
               required: [node]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+      '400':
+        $ref: '../components/responses/_shared.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses/_shared.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
   delete:
     tags: [learning-path-revisions]
-    summary: Skip a topic
-    description: Removes the topic from the included set.
+    summary: Skip a guide
+    description: Removes the guide from the included set.
     operationId: removePathNode
     security:
       - bearerAuth: []
     responses:
-      '200':
+      '204':
         description: Node removed
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                removed:
-                  type: boolean
-                  example: true
-              required: [removed]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+      '401':
+        $ref: '../components/responses/_shared.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
 
 /path-revisions/{id}/submit:
   parameters:
@@ -203,8 +208,10 @@
                 review_case_id:
                   $ref: '../components/schemas/common/Uuid.yaml'
               required: [review_case_id]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+      '401':
+        $ref: '../components/responses/_shared.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
 
 /path-revisions/{id}/rollback:
   parameters:
@@ -232,13 +239,21 @@
             required: [revision_id]
     responses:
       '201':
-        description: The node delta applied
+        description: Created; new draft revision id
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/learning-path-revisions/RollbackResult.yaml'
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+              type: object
+              properties:
+                revision_id:
+                  $ref: '../components/schemas/common/Uuid.yaml'
+              required: [revision_id]
+      '400':
+        $ref: '../components/responses/_shared.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses/_shared.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'
 
 /path-revisions/{id}/diff/{otherId}:
   parameters:
@@ -262,10 +277,6 @@
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                diff:
-                  type: string
-              required: [diff]
-      '501':
-        $ref: '../components/responses/_shared.yaml#/NotImplemented'
+              $ref: '../components/schemas/learning-path-revisions/LearningPathRevisionDiff.yaml'
+      '404':
+        $ref: '../components/responses/_shared.yaml#/NotFound'

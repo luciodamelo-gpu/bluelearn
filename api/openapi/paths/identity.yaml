@@ -42,7 +42,13 @@
       '401':
         $ref: '../components/responses/_shared.yaml#/Unauthorized'
       '409':
-        $ref: '../components/responses/_shared.yaml#/Conflict'
+        description: Username already taken
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/common/Error.yaml'
+            example:
+              error: Username already taken
 
 /profiles/{username}:
   get:
@@ -56,7 +62,7 @@
         required: true
         schema:
           type: string
-        example: tony
+        example: username123
     responses:
       '200':
         description: The public profile and role badges
