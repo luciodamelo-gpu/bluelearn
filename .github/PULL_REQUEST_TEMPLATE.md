@@ -4,22 +4,18 @@
 
 ## Type of change
 
-<!-- Keep only ONE option and delete the others. -->
+<!-- Check the ONE that best describes this change. -->
 
-- Bug fix
-- Feature
-- Refactor (no behavior change)
-- Documentation
-- Build / tooling / CI
-- Other: _________
+- [ ] Bug fix
+- [ ] Feature
+- [ ] Refactor (no behavior change)
+- [ ] Documentation
+- [ ] Build / tooling / CI
+- [ ] Other: _________
 
-## How was this tested?
+## Verification
 
-<!-- Required: Describe how you verified the change. -->
-
-### Verification
-
-<!-- Update checkboxes based on what verification methods were completed-->
+<!-- Update checkboxes based on what verification methods were completed. -->
 
 - [ ] `pnpm -r typecheck` passes
 - [ ] `pnpm -r build` passes
@@ -27,4 +23,4 @@
 - [ ] Followed the app layout conventions
 - [ ] No new dependencies, or new dependencies are justified and AGPL-compatible
 - [ ] Change does not violate any non-negotiable principle
-- [ ] Documentation only no changes to the codebase so no tests required
+- [ ] Documentation only, no changes to the codebase, so no tests required
