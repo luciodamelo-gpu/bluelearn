@@ -1,50 +1,71 @@
 import { Hono } from 'hono'
 import { requireUser } from '../middleware/auth.middleware'
 import type { HonoEnv } from '../types'
+import { zValidator } from '@hono/zod-validator'
+import { createLearningPathSchema } from '@bluelearn/schemas'
+import {
+  archiveLearningPath,
+  createLearningPath,
+  getLearningPathBySlug,
+  listLearningPathRevisions,
+  listPublishedLearningPaths,
+} from '../services/learning-path.service'
 
 export const learningPathsRouter = new Hono<HonoEnv>()
-  // List published learning paths
-  .get('/', (c) => c.json({ error: 'Not implemented' }, 501))
+  // Returns published paths as { learning_paths }.
+  .get('/', async (c) => {
+    const learning_paths = await listPublishedLearningPaths(c.get('supabase'))
+    return c.json({ learning_paths })
+  })
 
-  // Create a draft path: shell + revision 1, seeding the closure of the
-  // target(s) given in the body as the initial node set
-  .post('/', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
+  // 201 with { revision_id } for the editor route.
+  .post('/', requireUser, zValidator('json', createLearningPathSchema), async (c) => {
+    const { revision_id } = await createLearningPath(c.get('supabase'), c.req.valid('json'))
+    return c.json({ revision_id }, 201)
+  })
 
-  // Open a path: resolve the live current_revision_id and return
-  // its full snapshot
-  .get('/:slug', (c) => c.json({ error: 'Not implemented' }, 501))
+  // Returns the path and its live revision's snapshot as { path, snapshot }.
+  .get('/:slug', async (c) => {
+    const { path, snapshot } = await getLearningPathBySlug(c.get('supabase'), c.req.param('slug'))
+    return c.json({ path, snapshot })
+  })
 
-  // Archive the path
-  .delete('/:slug', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
+  // Archives the path. 404 if missing or not permitted.
+  .delete('/:slug', requireUser, async (c) => {
+    const path = await archiveLearningPath(c.get('supabase'), c.req.param('slug'))
+    return c.json({ path })
+  })
 
-  // Revision history for this path
-  .get('/:slug/revisions', (c) => c.json({ error: 'Not implemented' }, 501))
+  // Returns the revision history as { revisions }, newest first.
+  .get('/:slug/revisions', async (c) => {
+    const revisions = await listLearningPathRevisions(c.get('supabase'), c.req.param('slug'))
+    return c.json({ revisions })
+  })
 
-  // Start a new draft revision
+  // 201 with { revision_id } for the new draft.
   .post('/:slug/revisions', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
 
 export const learningPathRevisionsRouter = new Hono<HonoEnv>()
-  // Gets the full snapshot of one revision (current or old), including metadata,
-  // included nodes, and the revision's frozen projected edges
+  // Gets the full snapshot of one revision: metadata, nodes, projected edges, and raw edges.
   .get('/:id', (c) => c.json({ error: 'Not implemented' }, 501))
 
-  // Overwrite a draft revision's metadata (pre-submit only)
+  // Overwrite a draft revision's metadata (draft only)
   .patch('/:id', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
 
-  // The revision's included nodes
-  .get('/:id/nodes', (c) => c.json({ error: 'Not implemented' }, 501))
+  // Add a target: flag a base as a goal and pull its prerequisite closure into
+  // the node set. Returns the recomputed snapshot.
+  .post('/:id/targets', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
 
-  // Re-include a skipped topic as a node
-  .post('/:id/nodes', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
+  // Remove a target: clear the flag and remove topics kept only to reach it.
+  // Returns the recomputed snapshot.
+  .delete('/:id/targets/:baseId', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
 
-  // Swap the chosen variant, set a note, or toggle is_target on a node
+  // Edit a node: swap the chosen variant, set a note, toggle is_target, or
+  // skip/re-include it. Skipping is a soft hide, not a delete.
   .patch('/:id/nodes/:baseId', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
 
-  // Skip a topic: remove it from the included set
-  .delete('/:id/nodes/:baseId', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
-
-  // Submit for review: flips to submitted and opens a review_case
-  .post('/:id/submit', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
+  // Publish the draft directly: freeze its edges and point the path at it
+  .post('/:id/publish', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
 
   // Roll back: clone an older revision's targets/nodes into a new draft
   .post('/:id/rollback', requireUser, (c) => c.json({ error: 'Not implemented' }, 501))
