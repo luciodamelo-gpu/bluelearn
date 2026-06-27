@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
+import { createDecisionSchema } from '@bluelearn/schemas'
 import { requireUser } from '../middleware/auth.middleware'
 import type { HonoEnv } from '../types'
 import {
@@ -9,11 +9,6 @@ import {
   getReviewQueue,
   listMyReviewCases,
 } from '../services/review.service'
-
-const createDecisionSchema = z.object({
-  decision: z.enum(['approved', 'rejected']),
-  notes: z.string().trim().nullish(),
-})
 
 export const reviewsRouter = new Hono<HonoEnv>()
   // Open cases needing action from the current reviewer
