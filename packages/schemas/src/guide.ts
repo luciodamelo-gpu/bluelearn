@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { subjectReferenceSchema } from "./subject"
 
 // A guide starts as an empty draft and is fleshed out in the editor, so
 // every field is optional; knowledge_type defaults to theory.
@@ -64,6 +65,51 @@ export const updateRevisionSchema = z
     message: "at least one field is required",
   })
 
+// A lightweight guide pointer (e.g. a node in a path or walkthrough).
+export const guideReferenceSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+})
+
+// A published guide as the frontend consumes it. The body is the markdown (DB's
+// guide_revisions.body). word_count is the generated count the client turns into
+// reading time via WORDS_PER_MINUTE. prerequisites live on the separate walkthrough
+// shape, not this one.
+export const guideSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  author: z.string(),
+  summary: z.string().nullable(),
+  body: z.string().nullable(),
+  word_count: z.number().int(),
+  created_at: z.iso.datetime(),
+  tags: z.array(subjectReferenceSchema),
+})
+
+// The transitive prerequisite DAG for a guide, from compute_walkthrough. Depth is
+// the longest-chain distance from the target (depth 0). The client sorts by depth
+// descending for the linear walk and lays out nodes + edges for the graph view.
+export const walkthroughSchema = z.object({
+  nodes: z.array(
+    z.object({
+      id: z.uuid(),
+      slug: z.string(),
+      title: z.string(),
+      summary: z.string().nullable(),
+      depth: z.number().int(),
+    }),
+  ),
+  edges: z.array(
+    z.object({
+      from_id: z.uuid(),
+      to_id: z.uuid(),
+    }),
+  ),
+})
+
+export type GuideReference = z.infer<typeof guideReferenceSchema>
+export type Guide = z.infer<typeof guideSchema>
+export type Walkthrough = z.infer<typeof walkthroughSchema>
 export type CreateGuideInput = z.infer<typeof createGuideSchema>
 export type CreateVariantInput = z.infer<typeof createVariantSchema>
 export type CastVoteInput = z.infer<typeof castVoteSchema>
