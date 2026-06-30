@@ -78,15 +78,17 @@ function RouteComponent() {
               <PathCard key={path.slug} path={path} />
             ))}
           </div>
-          <PaginationWrapper
-            activePageNo={1}
-            onPageSelect={() => {}}
-            toFirst={() => {}}
-            onPrevious={() => {}}
-            onNext={() => {}}
-            toLast={() => {}}
-            totalPages={5}
-          />
+          <div className="mt-8 mb-4">
+            <PaginationWrapper
+              activePageNo={1}
+              onPageSelect={() => {}}
+              toFirst={() => {}}
+              onPrevious={() => {}}
+              onNext={() => {}}
+              toLast={() => {}}
+              totalPages={5}
+            />
+          </div>
         </CollapsibleSection>
 
         <CollapsibleSection
@@ -103,15 +105,17 @@ function RouteComponent() {
               <GuideCard key={index} guide={guide} />
             ))} */}
           </div>
-          <PaginationWrapper
-            activePageNo={1}
-            onPageSelect={() => {}}
-            toFirst={() => {}}
-            onPrevious={() => {}}
-            onNext={() => {}}
-            toLast={() => {}}
-            totalPages={5}
-          />
+          <div className="mt-8 mb-4">
+            <PaginationWrapper
+              activePageNo={1}
+              onPageSelect={() => {}}
+              toFirst={() => {}}
+              onPrevious={() => {}}
+              onNext={() => {}}
+              toLast={() => {}}
+              totalPages={5}
+            />
+          </div>
         </CollapsibleSection>
       </section>
     </div>
