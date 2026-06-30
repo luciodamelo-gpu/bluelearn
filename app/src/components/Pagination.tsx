@@ -2,6 +2,7 @@ import type { JSX } from "react";
 import {
   PaginationBase,
   PaginationContent,
+  PaginationEllipsis,
   PaginationFirst,
   PaginationItem,
   PaginationLast,
@@ -63,15 +64,35 @@ const Pages = ({
   PaginationWrapperPropTypes,
   "activePageNo" | "totalPages" | "onPageSelect"
 >): JSX.Element => {
+  const EXTRA_PAGES_TO_SHOW = 1;
   const renderedPages: Array<JSX.Element> = [];
+  const activePage = activePageNo > totalPages ? totalPages : activePageNo;
 
-  for (let pageNo = 1; pageNo <= totalPages; pageNo++) {
+  const startPage = activePage > EXTRA_PAGES_TO_SHOW ? activePage - EXTRA_PAGES_TO_SHOW : 1;
+
+  const doesExtraLastPagesOverflow = activePage + EXTRA_PAGES_TO_SHOW > totalPages;
+  const lastPage = doesExtraLastPagesOverflow
+                    ? totalPages
+                    : activePage + EXTRA_PAGES_TO_SHOW;
+
+  if (startPage !== 1) {
     renderedPages.push(
       <PaginationItem>
-        <PaginationLink
-          onClick={() => onPageSelect(pageNo)}
-          isActive={pageNo === activePageNo}
-        >{pageNo}</PaginationLink>
+        <PaginationEllipsis />
+      </PaginationItem>
+    )
+  }
+
+  for (let pageNo = startPage; pageNo <= lastPage; pageNo++) {
+    renderedPages.push(
+      <Page pageNo={pageNo} activePageNo={activePage} onPageSelect={onPageSelect} />
+    )
+  }
+
+  if (lastPage + EXTRA_PAGES_TO_SHOW < totalPages) {
+    renderedPages.push(
+      <PaginationItem>
+        <PaginationEllipsis />
       </PaginationItem>
     )
   }
@@ -79,4 +100,19 @@ const Pages = ({
   return <>
     {renderedPages}
   </>
+}
+
+const Page = ({
+  pageNo,
+  activePageNo,
+  onPageSelect
+}: { pageNo: number }
+  & Pick<PaginationWrapperPropTypes, "activePageNo" | "onPageSelect">
+) => {
+  return <PaginationItem>
+    <PaginationLink
+      onClick={() => onPageSelect(pageNo)}
+      isActive={pageNo === activePageNo}
+    >{pageNo}</PaginationLink>
+  </PaginationItem>;
 }
