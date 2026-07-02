@@ -154,7 +154,11 @@ function findMathDelimiterMatch(fullText: string): MathMatchResult | null {
         if (fullText[idx] === "$" && fullText[idx + 1] === "$") {
           // Check to avoid matching '$$$'
           if (idx === 0 || fullText[idx - 1] !== "$") {
-            return { isInline: false, startIdx: idx, delimLength: 2 };
+            return {
+              isInline: false,
+              startIdx: idx,
+              delimLength: 2,
+            };
           }
         }
         idx--;
@@ -174,7 +178,11 @@ function findMathDelimiterMatch(fullText: string): MathMatchResult | null {
             (idx === 0 || fullText[idx - 1] !== "$") &&
             fullText[idx + 1] !== "$";
           if (notAdjacentToDollar) {
-            return { isInline: true, startIdx: idx, delimLength: 1 };
+            return {
+              isInline: true,
+              startIdx: idx,
+              delimLength: 1,
+            };
           }
         }
         idx--;
