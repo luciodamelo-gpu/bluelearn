@@ -31,23 +31,18 @@ export async function getReviewQueue(supabase: DB, userId: string) {
 
   if (!data) return []
 
-  const titleMap = new Map<string, string | null>()
-  for (const rc of data) {
-    const guideReviewCase = (rc as Record<string, unknown>).guide_review_cases as
-      | Array<Record<string, unknown>>
-      | null
-    const title = (guideReviewCase?.[0] as Record<string, unknown> | undefined)
-      ?.guide_revisions as Record<string, unknown> | undefined
-    titleMap.set(rc.id, (title?.title as string) ?? null)
-  }
-
-  return data.map((rc) => ({
-    id: rc.id,
-    case_type: rc.case_type,
-    status: rc.status,
-    title: titleMap.get(rc.id) ?? null,
-    created_at: rc.created_at,
-  }))
+  return data.map((rc) => {
+    const raw = rc as Record<string, unknown>
+    const grc = raw.guide_review_cases as Record<string, unknown> | null
+    const gr = grc?.guide_revisions as Record<string, unknown> | undefined
+    return {
+      id: rc.id,
+      case_type: rc.case_type,
+      status: rc.status,
+      title: (gr?.title as string) ?? null,
+      created_at: rc.created_at,
+    }
+  })
 }
 
 // All finished review cases — public browse.
@@ -72,17 +67,14 @@ export async function listReviewCases(supabase: DB) {
   if (!data) return []
 
   return data.map((rc) => {
-    const guideReviewCase = (rc as Record<string, unknown>).guide_review_cases as
-      | Array<Record<string, unknown>>
-      | null
-    const title = (guideReviewCase?.[0] as Record<string, unknown> | undefined)
-      ?.guide_revisions as Record<string, unknown> | undefined
-
+    const raw = rc as Record<string, unknown>
+    const grc = raw.guide_review_cases as Record<string, unknown> | null
+    const gr = grc?.guide_revisions as Record<string, unknown> | undefined
     return {
       id: rc.id,
       case_type: rc.case_type,
       status: rc.status,
-      title: (title?.title as string) ?? null,
+      title: (gr?.title as string) ?? null,
       created_at: rc.created_at,
     }
   })
