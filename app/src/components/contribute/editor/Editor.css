@@ -172,6 +172,8 @@
   gap: 0.5rem !important;
   transition: all 0.2s ease !important;
   font-family: var(--font-sans) !important;
+  height: 2rem !important;
+  box-sizing: border-box !important;
 }
 
 [class*="_selectTrigger"]:hover,
