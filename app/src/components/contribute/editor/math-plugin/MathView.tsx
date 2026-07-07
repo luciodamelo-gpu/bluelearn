@@ -40,7 +40,7 @@ declare module "react" {
 
 export function MathView({ nodeKey, equation, inline }: MathViewProps) {
   const [editor] = useLexicalComposerContext();
-  const [isSelected] = useLexicalNodeSelection(nodeKey);
+  const [isSelected, setSelected] = useLexicalNodeSelection(nodeKey);
   const [isFocused, setIsFocused] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -49,6 +49,7 @@ export function MathView({ nodeKey, equation, inline }: MathViewProps) {
 
   const handleFocus = () => {
     setIsFocused(true);
+    setSelected(true);
   };
 
   const handleBlur = () => {
@@ -245,7 +246,7 @@ export function MathView({ nodeKey, equation, inline }: MathViewProps) {
         <math-field
           ref={ref}
           defaultValue={equation}
-          readOnly={!isSelected && !isFocused}
+          readOnly={!editor.isEditable()}
           onFocus={handleFocus}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
@@ -257,7 +258,10 @@ export function MathView({ nodeKey, equation, inline }: MathViewProps) {
         />
         <button
           type="button"
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           onClick={handleDelete}
           className="absolute -top-4 -right-2.5 z-20 flex scale-90 items-center justify-center rounded-full border border-slate-200 bg-white p-1 text-slate-400 opacity-0 shadow-md transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500"
           title="Delete equation"
@@ -298,7 +302,7 @@ export function MathView({ nodeKey, equation, inline }: MathViewProps) {
         <math-field
           ref={ref}
           defaultValue={equation}
-          readOnly={!isSelected && !isFocused}
+          readOnly={!editor.isEditable()}
           onFocus={handleFocus}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
@@ -311,7 +315,10 @@ export function MathView({ nodeKey, equation, inline }: MathViewProps) {
       </div>
       <button
         type="button"
-        onMouseDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         onClick={handleDelete}
         className="absolute -top-3 -right-3 z-20 flex scale-90 items-center justify-center rounded-full border border-slate-200 bg-white p-1 text-slate-400 opacity-0 shadow-md transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500"
         title="Delete equation"
