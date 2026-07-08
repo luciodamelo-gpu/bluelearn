@@ -248,7 +248,7 @@ export async function getReviewCase(supabase: DB, caseId: string) {
         return {
           id: d.id,
           decision: d.decision,
-          justification: d.notes,
+          notes: d.notes,
           reasons: d.review_decision_reasons?.map((r) => r.reason) ?? [],
           created_at: d.created_at,
         };
@@ -301,7 +301,7 @@ export async function castDecision(
       },
       { onConflict: "panel_member_id" }
     )
-    .select()
+    .select("id, decision, notes, created_at")
     .single();
 
   if (upsertError) {
@@ -309,5 +309,11 @@ export async function castDecision(
     throw new ServiceError("Failed to record decision", 500);
   }
 
-  return decision;
+  return {
+    id: decision.id,
+    decision: decision.decision,
+    notes: decision.notes,
+    reasons: [],
+    created_at: decision.created_at,
+  };
 }

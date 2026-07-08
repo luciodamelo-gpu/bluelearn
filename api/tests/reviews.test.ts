@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import app from "../src/index";
-import { env, jsonAuth, makeUser } from "./helpers";
+import { env, jsonAuth, makeUser, type Insert } from "./helpers";
 import {
   createReviewCase,
   createReviewPanel,
@@ -14,12 +14,17 @@ import {
 } from "./factories/guides";
 import { expectToMatchSpec } from "./openapi";
 
-async function seedQueueCase(userId: string, title: string) {
+async function seedQueueCase(
+  userId: string,
+  title: string,
+  status: Insert<"review_cases">["status"] = "pending"
+) {
   const base = await createGuideBase();
   const guide = await createGuide(base.id);
   const revision = await createGuideRevision(guide.id, { title });
   const reviewCase = await createReviewCase(userId, {
     case_type: "guide_publish",
+    status,
   });
   const panel = await createReviewPanel(reviewCase.id);
   await createPanelMember(panel.id, userId);
@@ -74,7 +79,7 @@ describe("GET /reviews/queue", () => {
 describe("GET /reviews/cases", () => {
   it("lists review cases", async () => {
     const { userId } = await makeUser();
-    const reviewCase = await seedQueueCase(userId, "Statistics");
+    const reviewCase = await seedQueueCase(userId, "Statistics", "approved");
 
     const res = await app.request("/reviews/cases", {}, env);
 
@@ -118,7 +123,7 @@ describe("POST /reviews/cases/{id}/decisions", () => {
       `/reviews/cases/${reviewCase.id}/decisions`,
       jsonAuth(token, "POST", {
         decision: "approved",
-        justification: "Clear and accurate.",
+        notes: "Clear and accurate.",
       }),
       env
     );
