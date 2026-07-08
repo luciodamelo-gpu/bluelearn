@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode, HeadingNode } from "@lexical/rich-text";
+import { COMMAND_PRIORITY_LOW, KEY_DOWN_COMMAND } from "lexical";
 import { lexical } from "@mdxeditor/editor";
 
 interface H1RestrictionListenerProps {
@@ -37,71 +38,72 @@ export default function H1RestrictionListener({
       }
     );
 
-    // 2. Intercept typed Markdown H1 shortcuts: '# ' at the beginning of a line
-    const removeUpdateListener = editor.registerUpdateListener(
-      ({ tags, dirtyLeaves, editorState }) => {
-        // Skip updates coming from history undo/redo or collaboration to prevent loops
-        if (
-          tags.has("collaboration") ||
-          tags.has("historic") ||
-          editor.isComposing()
-        ) {
-          return;
-        }
+    // 2. Intercept typed Markdown H1 shortcuts: '# ' at the beginning of a line via keyboard command
+    const removeKeyboardListener = editor.registerCommand(
+      KEY_DOWN_COMMAND,
+      (event: KeyboardEvent) => {
+        if (event.key === " ") {
+          const state = { handled: false };
 
-        editorState.read(() => {
-          const selection = $getSelection();
-          if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+          editor.update(() => {
+            const selection = $getSelection();
+            if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+              return;
+            }
 
-          const anchorKey = selection.anchor.key;
-          const anchorOffset = selection.anchor.offset;
-          const anchorNode = $getNodeByKey(anchorKey);
+            const anchorKey = selection.anchor.key;
+            const offset = selection.anchor.offset;
+            const anchorNode = $getNodeByKey(anchorKey);
 
-          if (!$isTextNode(anchorNode) || !dirtyLeaves.has(anchorKey)) return;
+            if (!$isTextNode(anchorNode) || offset !== 1) {
+              return;
+            }
 
-          // Skip processing inside code blocks or other specialized containers
-          const parentNode = anchorNode.getParent();
-          if (parentNode === null || parentNode.getType() === "code") return;
-
-          const textContent = anchorNode.getTextContent();
-          const textBeforeCursor = textContent.slice(0, anchorOffset);
-
-          // If the user typed '# ' at the very start of a paragraph
-          if (textBeforeCursor === "# ") {
-            editor.update(() => {
-              if (parentNode.getType() === "paragraph") {
+            const textContent = anchorNode.getTextContent();
+            if (textContent.startsWith("#")) {
+              const parentNode = anchorNode.getParent();
+              if (
+                parentNode &&
+                parentNode.getType() === "paragraph" &&
+                parentNode.getFirstChild() === anchorNode
+              ) {
                 const headingNode = $createHeadingNode("h2");
 
-                if (textContent === "# ") {
-                  // Paragraph is empty other than the shortcut.
-                  // Create a new text node, append it to the heading, and select it.
+                if (textContent === "#") {
+                  // Paragraph is empty other than the "#" character.
                   const textNode = lexical.$createTextNode("");
                   headingNode.append(textNode);
                   parentNode.replace(headingNode);
                   textNode.select();
                 } else {
-                  // Paragraph has other content. Strip '# ' and keep existing children.
-                  anchorNode.setTextContent(textContent.slice(2));
+                  // Paragraph has other content after the "#". Strip it and keep children.
+                  anchorNode.setTextContent(textContent.slice(1));
                   parentNode.getChildren().forEach((child) => {
                     headingNode.append(child);
                   });
                   parentNode.replace(headingNode);
-
-                  // Safely select the heading node at its start
                   headingNode.select(0, 0);
                 }
+                onH1Attempted();
+                state.handled = true;
               }
-            });
-            onH1Attempted();
+            }
+          });
+
+          if (state.handled) {
+            event.preventDefault();
+            return true;
           }
-        });
-      }
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_LOW
     );
 
     // Unsubscribe both listeners on unmount
     return () => {
       removeMutationListener();
-      removeUpdateListener();
+      removeKeyboardListener();
     };
   }, [editor, onH1Attempted]);
 
