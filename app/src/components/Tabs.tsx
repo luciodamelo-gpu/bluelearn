@@ -7,7 +7,7 @@ type Tab = {
 };
 
 type PropTypes = {
-  tabs: Tab[];
+  tabs: Array<Tab>;
   defaultTab?: string;
 };
 

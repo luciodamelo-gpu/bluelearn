@@ -2,19 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import type { HydratedPath } from "@/types/paths";
 import type { Guide } from "@/types/guides";
+import type { Subject } from "@/types/subjects";
 
 import { Separator } from "@/components/ui/separator";
 import { PathCard } from "@/components/cards/PathCard";
 import { GuideCard } from "@/components/cards/GuideCard";
 import { CustomTabs } from "@/components/Tabs";
-
-import { hydratePaths } from "@/lib/getData";
+import { SubjectCard } from "@/components/cards/SubjectCard";
 
 import guides from "@/data/guides.json";
 import paths from "@/data/paths.json";
 import subjects from "@/data/subjects.json";
-import type { Subject } from "@/types/subjects";
-import { SubjectCard } from "@/components/cards/SubjectCard";
+
+import { hydratePaths } from "@/lib/getData";
 
 export const Route = createFileRoute("/review/")({ component: RouteComponent });
 

@@ -1,6 +1,8 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 import { Tabs as TabsPrimitive } from "radix-ui";
+import { cva } from "class-variance-authority";
+
+import type { VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
@@ -63,7 +65,7 @@ function TabsTrigger({
       className={cn(
         "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium",
         "text-muted-foreground transition-colors",
-        "hover:text-foreground hover:bg-badge",
+        "hover:bg-badge hover:text-foreground",
         "data-[state=active]:bg-primary",
         "data-[state=active]:text-primary-foreground",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
