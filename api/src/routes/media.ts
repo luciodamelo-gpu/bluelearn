@@ -3,7 +3,11 @@ import { requireUser } from "../middleware/auth.middleware";
 import type { HonoEnv } from "../types";
 import { fileSchema, uuidSchema } from "@bluelearn/schemas";
 
-import { uploadMediaFile, addMediaRevision } from "../services/media.service";
+import {
+  uploadMediaFile,
+  assertRevisionLinkable,
+  linkAssetToRevision,
+} from "../services/media.service";
 
 export const mediaRouter = new Hono<HonoEnv>()
   // 400 unless a valid file and a revision_id are present; returns the stored
@@ -23,10 +27,9 @@ export const mediaRouter = new Hono<HonoEnv>()
     }
 
     const supabase = c.get("supabase");
+    await assertRevisionLinkable(revisionId.data, userId, supabase);
     const asset = await uploadMediaFile(file.data, userId, supabase);
-
-    // Link the asset to the revision so it is tracked immediately.
-    await addMediaRevision(revisionId.data, asset.id, supabase);
+    await linkAssetToRevision(revisionId.data, asset.id, supabase);
 
     return c.json(
       { url: asset.url, path: asset.path, mime_type: asset.mime_type },

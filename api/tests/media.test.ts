@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import app from "../src/index";
-import { env, makeUser } from "./helpers";
+import { admin, env, makeUser } from "./helpers";
 import { expectToMatchSpec } from "./openapi";
 import {
   createGuideBase,
@@ -47,8 +47,8 @@ describe("POST /media/upload", () => {
     await expectToMatchSpec(res, "POST", "/media/upload");
   });
 
-  it("404s when the revision does not exist", async () => {
-    const { token } = await makeUser();
+  it("404s without leaving an orphan asset when the revision is missing", async () => {
+    const { token, userId } = await makeUser();
     const form = new FormData();
     form.append(
       "file",
@@ -69,5 +69,12 @@ describe("POST /media/upload", () => {
 
     expect(res.status).toBe(404);
     await expectToMatchSpec(res, "POST", "/media/upload");
+
+    // The revision is checked before the upload, so nothing is stored.
+    const { data: orphans } = await admin
+      .from("media_assets")
+      .select("id")
+      .eq("uploaded_by", userId);
+    expect(orphans).toEqual([]);
   });
 });

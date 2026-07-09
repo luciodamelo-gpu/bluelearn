@@ -21,10 +21,11 @@ export async function uploadMediaFile(
   // Uploads media file to bucket and store path in database
   const cleanFileName = fileNameCleaner(file.name);
 
-  // Upload to storage
+  // Upload to storage. A random prefix keeps the storage_key unique even when
+  // two files share a name or land in the same millisecond.
   const { data: uploadData, error: uploadError } = await db.storage
     .from("media")
-    .upload(`uploads/${Date.now()}_${cleanFileName}`, file);
+    .upload(`uploads/${crypto.randomUUID()}_${cleanFileName}`, file);
 
   if (uploadError) {
     console.error(uploadError);
@@ -58,59 +59,52 @@ export async function uploadMediaFile(
   };
 }
 
-export async function addMediaRevision(
+export async function assertRevisionLinkable(
+  revision_id: UUID,
+  userId: string,
+  db: DB
+) {
+  // Confirm the caller owns a draft revision to attach the asset to, before
+  // anything is uploaded, so a bad revision_id never leaves an orphan asset.
+  const { data, error } = await db
+    .from("guide_revisions")
+    .select("id")
+    .eq("id", revision_id)
+    .eq("author_id", userId)
+    .eq("status", "draft")
+    .maybeSingle();
+
+  if (error) {
+    console.error("guide_revisions lookup failed:", error.message);
+    throw new ServiceError("Failed to look up guide revision", 500);
+  }
+  if (!data) {
+    throw new ServiceError("Guide revision not found", 404);
+  }
+}
+
+export async function linkAssetToRevision(
   revision_id: UUID,
   asset_id: UUID,
   db: DB
 ) {
-  // Create a new revision entry for a media asset
-
-  // Check guide_revisions.id and media_assets.id exist
-  const revisionQuery = db
-    .from("guide_revisions")
-    .select("id")
-    .eq("id", revision_id)
-    .single();
-  const assetQuery = db
-    .from("media_assets")
-    .select("id")
-    .eq("id", asset_id)
-    .single();
-  const [revisionResult, assetResult] = await Promise.all([
-    revisionQuery,
-    assetQuery,
-  ]);
-
-  const { error: assetFindError } = assetResult;
-  const { error: revisionFindError } = revisionResult;
-
-  if (revisionFindError) {
-    throw new ServiceError("Guide revision not found", 404);
-  }
-  if (assetFindError) {
-    throw new ServiceError("Asset not found", 404);
-  }
-
+  // Link an existing asset to a revision. The foreign keys are the source of
+  // truth: a 23503 means the revision was deleted between the pre-check and
+  // here, so treat it as not found rather than re-querying to confirm.
   const { data: revisionEntry, error: revisionInsertError } = await db
     .from("revision_assets")
-    .insert({
-      revision_id: revision_id,
-      asset_id: asset_id,
-    })
+    .insert({ revision_id, asset_id })
     .select()
     .single();
 
   if (revisionInsertError) {
-    if (revisionInsertError.code == "23503") {
-      console.error(revisionInsertError);
-      throw new ServiceError("Internal server error", 500);
+    if (revisionInsertError.code === "23503") {
+      throw new ServiceError("Guide revision not found", 404);
     }
-
     console.error(
       "revision_assets insert failed:",
       revisionInsertError.message
     );
-    console.error(revisionInsertError);
     throw new ServiceError("Failed to create media revision entry", 500);
   }
 
