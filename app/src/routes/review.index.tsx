@@ -5,7 +5,7 @@ import type { Guide } from "@/types/guides";
 import type { Subject } from "@/types/subjects";
 
 import { Separator } from "@/components/ui/separator";
-import { PathCard } from "@/components/cards/PathCard";
+import { PathCard } from "@/components/cards/ObjectiveCard";
 import { GuideCard } from "@/components/cards/GuideCard";
 import { CustomTabs } from "@/components/Tabs";
 import { SubjectCard } from "@/components/cards/SubjectCard";

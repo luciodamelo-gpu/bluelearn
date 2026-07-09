@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { HydratedObjective, Level } from "@/types/objectives";
 
 import { Separator } from "@/components/ui/separator";
-import { PathCard } from "@/components/cards/PathCard";
+import { PathCard } from "@/components/cards/ObjectiveCard";
 import { GuideCard } from "@/components/cards/GuideCard";
 
 import { hydrateObjectives } from "@/lib/getData";
