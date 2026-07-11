@@ -8,8 +8,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Footer } from "@/components/cards/Footer";
 
-import { Route as GuideRoute } from "@/routes/guides.$slug";
-
 type GuideProp = Guide & {
   stats?: Array<{ label: string; data: number }>;
   actionBtns?: React.ReactNode;

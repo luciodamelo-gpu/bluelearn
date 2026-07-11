@@ -3,6 +3,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import type { HydratedObjective, Level } from "@/types/objectives";
 
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { GuideCard } from "@/components/cards/GuideCard";
 
 import { getPathBySlug, hydrateObjectives } from "@/lib/getData";
@@ -10,7 +11,8 @@ import { formatDuration } from "@/lib/guideUtils";
 
 import objectives from "@/data/objectives.json";
 import guides from "@/data/guides.json";
-import { Button } from "@/components/ui/button";
+
+import { Route as GuideRoute } from "@/routes/guides.$slug";
 
 export const Route = createFileRoute("/objectives/$slug")({
   component: PathPage,
@@ -67,6 +69,7 @@ function PathPage() {
                   title: hydratedObjectives[0].title,
                   path: `/objectives/${slug}`,
                 }}
+                to={GuideRoute.to}
               />
             );
           })}
