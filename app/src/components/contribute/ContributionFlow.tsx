@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type {
   ContributionType,
   GuideContribution,
+  ObjectiveContribution,
 } from "@/types/contributions";
 
 import { SelectType } from "@/components/contribute/steps/SelectType";
@@ -29,6 +30,19 @@ export default function ContributionFlow() {
     prereqs: [],
     todoPrereqs: [],
   });
+  const [objectiveContData, setObjectiveContData] =
+    useState<ObjectiveContribution>({
+      title: "",
+      summary: "",
+      selectedSlugs: [
+        "arithmetic-introduction",
+        "algebra-how-to-express-equations",
+        "calculus-introduction",
+        "vectors-introduction",
+        "mechanics-how-to-apply-newtons-laws",
+      ],
+      subObjectives: [],
+    });
 
   const StepperInstance = useMemo(() => {
     if (!type) {
@@ -50,6 +64,8 @@ export default function ContributionFlow() {
           Stepper={Stepper}
           guideContData={guideContData}
           setGuideContData={setGuideContData}
+          objectiveContData={objectiveContData}
+          setObjectiveContData={setObjectiveContData}
         />
       )}
     </Stepper.Root>
@@ -63,6 +79,8 @@ function Inner({
   Stepper,
   guideContData,
   setGuideContData,
+  objectiveContData,
+  setObjectiveContData,
 }: {
   type: ContributionType | null;
   setType: (t: ContributionType) => void;
@@ -70,6 +88,8 @@ function Inner({
   Stepper: any;
   guideContData: GuideContribution;
   setGuideContData: Dispatch<SetStateAction<GuideContribution>>;
+  objectiveContData: ObjectiveContribution;
+  setObjectiveContData: Dispatch<SetStateAction<ObjectiveContribution>>;
 }) {
   const stepper = useStepper();
 
@@ -130,7 +150,11 @@ function Inner({
         <BaseGuide Stepper={Stepper} />
         <Content Stepper={Stepper} />
         <SelectObjectiveGuides Stepper={Stepper} />
-        <OrderObjectiveGuides Stepper={Stepper} />
+        <OrderObjectiveGuides
+          Stepper={Stepper}
+          objectiveContData={objectiveContData}
+          setObjectiveContData={setObjectiveContData}
+        />
 
         <Submit Stepper={Stepper} />
       </div>

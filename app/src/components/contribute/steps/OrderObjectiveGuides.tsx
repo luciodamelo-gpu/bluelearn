@@ -6,6 +6,8 @@ import {
   ListOrdered,
   Milestone,
 } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
+import type { ObjectiveContribution } from "@/types/contributions";
 import { StepperActionHeader } from "@/components/contribute/StepperActionHeader";
 import { Combobox } from "@/components/ui/combobox";
 import {
@@ -28,21 +30,10 @@ import guidesData from "@/data/guides.json";
 // Map for O(1) guide lookup
 const guidesMap = new Map(guidesData.map((g) => [g.slug, g]));
 
-// Filter out the guides we mocked as selected from the previous step
-const MOCK_SELECTED_SLUGS = [
-  "arithmetic-introduction",
-  "algebra-how-to-express-equations",
-  "calculus-introduction",
-  "vectors-introduction",
-  "mechanics-how-to-apply-newtons-laws",
-];
-
-const selectedGuidesList = guidesData.filter((g) =>
-  MOCK_SELECTED_SLUGS.includes(g.slug)
-);
-
 type PropTypes = {
   Stepper: any;
+  objectiveContData: ObjectiveContribution;
+  setObjectiveContData: Dispatch<SetStateAction<ObjectiveContribution>>;
 };
 
 type WalkthroughNode = {
@@ -117,27 +108,86 @@ const computeWalkthrough = (targetSlug: string): Array<WalkthroughNode> => {
   return result;
 };
 
-export const OrderObjectiveGuides = ({ Stepper }: PropTypes) => {
+export const OrderObjectiveGuides = ({
+  Stepper,
+  objectiveContData,
+  setObjectiveContData,
+}: PropTypes) => {
   const [targetSlug, setTargetSlug] = useState<string>(
-    "mechanics-how-to-apply-newtons-laws"
+    objectiveContData.selectedSlugs[0] || ""
   );
   const [curatedSequence, setCuratedSequence] = useState<Array<string>>([]);
 
-  const targetGuide = guidesMap.get(targetSlug);
+  const selectedGuidesList = guidesData.filter((g) =>
+    objectiveContData.selectedSlugs.includes(g.slug)
+  );
+
+  const targetGuide = targetSlug ? guidesMap.get(targetSlug) : undefined;
 
   // Compute walkthrough nodes for the target
-  const walkthroughNodes = computeWalkthrough(targetSlug);
+  const walkthroughNodes = targetSlug ? computeWalkthrough(targetSlug) : [];
+
+  const updateSubObjective = (slug: string, newSeq: Array<string>) => {
+    setObjectiveContData((prev) => {
+      const exists = prev.subObjectives.some((s) => s.targetSlug === slug);
+      const updatedSubs = exists
+        ? prev.subObjectives.map((s) =>
+            s.targetSlug === slug
+              ? { ...s, curatedSequence: newSeq, selectedSlugs: newSeq }
+              : s
+          )
+        : [
+            ...prev.subObjectives,
+            {
+              targetSlug: slug,
+              selectedSlugs: newSeq,
+              curatedSequence: newSeq,
+            },
+          ];
+      return {
+        ...prev,
+        subObjectives: updatedSubs,
+      };
+    });
+  };
 
   // Sync initial curated sequence when target guide changes
   useEffect(() => {
-    const nodes = computeWalkthrough(targetSlug);
-    // Seed with all prerequisites (excluding the target guide itself) sorted by levels
-    const initialPrereqs = nodes
-      .filter((n) => n.slug !== targetSlug)
-      .sort((a, b) => a.level - b.level)
-      .map((n) => n.slug);
+    if (!targetSlug) return;
 
-    setCuratedSequence(initialPrereqs);
+    const existingSub = objectiveContData.subObjectives.find(
+      (s) => s.targetSlug === targetSlug
+    );
+
+    if (existingSub) {
+      setCuratedSequence(existingSub.curatedSequence);
+    } else {
+      const nodes = computeWalkthrough(targetSlug);
+      // Seed with all prerequisites (excluding the target guide itself) sorted by levels
+      const initialPrereqs = nodes
+        .filter((n) => n.slug !== targetSlug)
+        .sort((a, b) => a.level - b.level)
+        .map((n) => n.slug);
+
+      setCuratedSequence(initialPrereqs);
+
+      setObjectiveContData((prev) => {
+        if (prev.subObjectives.some((s) => s.targetSlug === targetSlug)) {
+          return prev;
+        }
+        return {
+          ...prev,
+          subObjectives: [
+            ...prev.subObjectives,
+            {
+              targetSlug,
+              selectedSlugs: initialPrereqs,
+              curatedSequence: initialPrereqs,
+            },
+          ],
+        };
+      });
+    }
   }, [targetSlug]);
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -155,14 +205,15 @@ export const OrderObjectiveGuides = ({ Stepper }: PropTypes) => {
     const currentDragged = draggedIndexRef.current;
     if (currentDragged === null || currentDragged === index) return;
 
-    setCuratedSequence((prev) => {
-      const newList = [...prev];
-      const draggedItem = newList[currentDragged];
-      if (!draggedItem) return prev;
-      newList.splice(currentDragged, 1);
-      newList.splice(index, 0, draggedItem);
-      return newList;
-    });
+    const newSeq = [...curatedSequence];
+    const draggedItem = newSeq[currentDragged];
+    if (!draggedItem) return;
+    newSeq.splice(currentDragged, 1);
+    newSeq.splice(index, 0, draggedItem);
+
+    setCuratedSequence(newSeq);
+    updateSubObjective(targetSlug, newSeq);
+
     draggedIndexRef.current = index;
     setDraggedIndex(index);
   };
@@ -174,11 +225,14 @@ export const OrderObjectiveGuides = ({ Stepper }: PropTypes) => {
 
   // Toggle selection of guide in the walkthrough
   const handleToggleGuide = (slug: string, checked: boolean) => {
+    let newSeq: Array<string>;
     if (checked) {
-      setCuratedSequence((prev) => [...prev, slug]);
+      newSeq = [...curatedSequence, slug];
     } else {
-      setCuratedSequence((prev) => prev.filter((s) => s !== slug));
+      newSeq = curatedSequence.filter((s) => s !== slug);
     }
+    setCuratedSequence(newSeq);
+    updateSubObjective(targetSlug, newSeq);
   };
 
   // Group walkthrough nodes by level for display

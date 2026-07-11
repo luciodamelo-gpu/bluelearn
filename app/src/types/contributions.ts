@@ -8,3 +8,16 @@ export type GuideContribution = {
   prereqs: Array<string>;
   todoPrereqs: Array<string>;
 };
+
+export type SubObjective = {
+  targetSlug: string;
+  selectedSlugs: Array<string>;
+  curatedSequence: Array<string>;
+};
+
+export type ObjectiveContribution = {
+  title: string;
+  summary: string;
+  selectedSlugs: Array<string>;
+  subObjectives: Array<SubObjective>;
+};
