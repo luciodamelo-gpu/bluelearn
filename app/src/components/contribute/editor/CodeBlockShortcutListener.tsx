@@ -90,23 +90,12 @@ export default function CodeBlockShortcutListener() {
           const root = $getRoot();
           const children = root.getChildren();
 
-          // Diagnostic log to see the exact structure Lexical creates on paste/update
-          console.log(
-            "[CodeBlockShortcutListener] Editor Update. Node Structure:",
-            children.map((c) => ({
-              type: c.getType(),
-              text: c.getTextContent(),
-            }))
-          );
-
           let startNode: any = null;
           let language = "";
           let collectedLines: Array<string> = [];
           let nodesToDelete: Array<any> = [];
 
-          for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-
+          for (const child of children) {
             if (child.getType() === "paragraph") {
               const text = child.getTextContent().trim();
 
