@@ -401,21 +401,6 @@ export const OrderObjectiveGuides = ({
                     >
                       {/* Left controls column positioned absolutely with background and border separation */}
                       <div className="absolute inset-y-0 left-0 z-10 w-9 rounded-l-lg border-r border-border/70 bg-muted/40">
-                        {/* Swap Variant Button at the top */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-2.5 left-1.5 z-10 h-6 w-6 border-none p-0 text-muted-foreground/60 hover:bg-primary/10 hover:text-primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsVariantAlertOpen(true);
-                          }}
-                          onDragStart={(e) => e.stopPropagation()}
-                          title="Swap Variant"
-                        >
-                          <Replace className="h-3.5 w-3.5" />
-                        </Button>
-
                         {/* Drag Icon completely centered vertically */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/60 hover:text-foreground">
                           <GripVertical className="h-4 w-4" />
@@ -477,15 +462,34 @@ export const OrderObjectiveGuides = ({
                         </div>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0 border-none text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => handleToggleGuide(slug, false)}
-                        title="Remove from Sequence"
-                      >
-                        <span className="text-lg leading-none">&times;</span>
-                      </Button>
+                      {/* Right controls column: Remove (top-right) and Swap Variant (bottom-right) */}
+                      <div className="flex shrink-0 flex-col items-center justify-between gap-3 self-stretch">
+                        {/* Remove Button in the upper right */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0 border-none text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => handleToggleGuide(slug, false)}
+                          title="Remove from Sequence"
+                        >
+                          <span className="text-lg leading-none">&times;</span>
+                        </Button>
+
+                        {/* Swap Variant Button in the bottom right */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 border-none p-0 text-primary hover:bg-primary/20"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsVariantAlertOpen(true);
+                          }}
+                          onDragStart={(e) => e.stopPropagation()}
+                          title="Swap Variant"
+                        >
+                          <Replace className="h-5 w-5" />
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
@@ -504,17 +508,6 @@ export const OrderObjectiveGuides = ({
                         <span className="inline-flex items-center rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-primary uppercase">
                           Target
                         </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 border-none p-0 text-primary hover:bg-primary/20"
-                          onClick={() => {
-                            setIsVariantAlertOpen(true);
-                          }}
-                          title="Swap Target Variant"
-                        >
-                          <Replace className="h-3.5 w-3.5" />
-                        </Button>
                       </div>
                       {/* Target Guide Author, Date, & Duration under title, before description */}
                       {(targetGuide.author ||
@@ -558,6 +551,21 @@ export const OrderObjectiveGuides = ({
                           ))}
                         </div>
                       )}
+                    </div>
+
+                    {/* Right controls column: Swap Variant (bottom-right) */}
+                    <div className="flex shrink-0 flex-col items-center justify-end self-stretch">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 border-none p-0 text-primary hover:bg-primary/20"
+                        onClick={() => {
+                          setIsVariantAlertOpen(true);
+                        }}
+                        title="Swap Target Variant"
+                      >
+                        <Replace className="h-5 w-5" />
+                      </Button>
                     </div>
                   </div>
                 )}
