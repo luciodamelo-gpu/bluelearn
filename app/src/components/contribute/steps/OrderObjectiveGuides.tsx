@@ -146,33 +146,23 @@ export const OrderObjectiveGuides = ({
   const [curatedSequence, setCuratedSequence] = useState<Array<string>>([]);
   const [isVariantAlertOpen, setIsVariantAlertOpen] = useState(false);
 
-  // Find violations in the current sequence
-  const findViolations = (): Record<string, Array<string> | undefined> => {
-    const violations: Record<string, Array<string> | undefined> = {};
+  // Check if the current sequence has a custom ordering (deviating from strict level/prerequisite ordering)
+  const checkIsCustomSequence = (): boolean => {
     const slugToIndex: Record<string, number> = {};
     curatedSequence.forEach((slug, idx) => {
       slugToIndex[slug] = idx;
     });
 
-    curatedSequence.forEach((slug) => {
+    return curatedSequence.some((slug) => {
       const transPrereqs = getTransitivePrereqs(slug);
-      const outOfOrderPrereqs: Array<string> = [];
-      transPrereqs.forEach((prereq) => {
-        if (prereq in slugToIndex && slugToIndex[prereq] > slugToIndex[slug]) {
-          const title = guidesMap.get(prereq)?.title || prereq;
-          outOfOrderPrereqs.push(title);
-        }
-      });
-      if (outOfOrderPrereqs.length > 0) {
-        violations[slug] = outOfOrderPrereqs;
-      }
+      return Array.from(transPrereqs).some(
+        (prereq) =>
+          prereq in slugToIndex && slugToIndex[prereq] > slugToIndex[slug]
+      );
     });
-
-    return violations;
   };
 
-  const violations = findViolations();
-  const isCustomSequence = Object.keys(violations).length > 0;
+  const isCustomSequence = checkIsCustomSequence();
 
   const selectedGuidesList = guidesData.filter((g) =>
     objectiveContData.targets.includes(g.slug)

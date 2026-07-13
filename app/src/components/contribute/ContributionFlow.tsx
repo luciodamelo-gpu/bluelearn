@@ -30,6 +30,7 @@ export default function ContributionFlow() {
     prereqs: [],
     todoPrereqs: [],
   });
+
   const [objectiveContData, setObjectiveContData] =
     useState<ObjectiveContribution>({
       title: "",

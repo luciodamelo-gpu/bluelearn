@@ -28,7 +28,7 @@ export const ObjectiveDetails = ({
     };
   });
 
-  const targets = useMemo(
+  const targs = useMemo(
     () =>
       guides.filter((item) => objectiveContData.targets.includes(item.value)),
     [guides, objectiveContData.targets]
@@ -124,7 +124,7 @@ export const ObjectiveDetails = ({
           </FieldLabel>
 
           <Combobox
-            items={targets}
+            items={targs}
             value={objectiveContData.featured}
             onValueChange={(featured) =>
               setObjectiveContData((prev) => ({
