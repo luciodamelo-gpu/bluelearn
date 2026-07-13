@@ -116,22 +116,21 @@ export async function listSubjectObjectives(supabase: DB, rawSlug: string) {
        current:objective_revisions!objectives_current_revision_id_fkey(title, summary)`
     )
     .eq("objective_subjects.subject_id", subject.id)
-    .eq("status", "published")
-    .order("title", {
-      foreignTable: "current",
-      ascending: true,
-    });
+    .eq("status", "published");
 
   if (objError) {
     console.error(objError);
     throw new ServiceError("Failed to load subject objectives", 500);
   }
 
-  return (data ?? []).map(
-    ({ current, objective_subjects: _tags, ...rest }) => ({
+  // Title lives on the revision and the node -> revision FK is
+  // composite (to-many), so PostgREST can't sort the nodes by
+  // it. Sort the mapped list here instead.
+  return (data ?? [])
+    .map(({ current, objective_subjects: _tags, ...rest }) => ({
       ...rest,
       title: current?.title ?? null,
       summary: current?.summary ?? null,
-    })
-  );
+    }))
+    .sort((a, b) => (a.title ?? "").localeCompare(b.title ?? ""));
 }
