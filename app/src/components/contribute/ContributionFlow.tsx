@@ -12,21 +12,21 @@ import { SelectType } from "@/components/contribute/steps/SelectType";
 import { GuideDetails } from "@/components/contribute/steps/GuideDetails";
 import { VariantDetails } from "@/components/contribute/steps/VariantDetails";
 import { Content } from "@/components/contribute/steps/Content";
-import { BaseGuide } from "@/components/contribute/steps/BaseGuide";
 import { ObjectiveDetails } from "@/components/contribute/steps/ObjectiveDetails";
 import { Submit } from "@/components/contribute/steps/Submit";
-import { SelectObjectiveGuides } from "@/components/contribute/steps/SelectObjectiveGuides";
 import { OrderObjectiveGuides } from "@/components/contribute/steps/OrderObjectiveGuides";
 
 import { flows, typeStep } from "@/lib/contributionFlow";
 
 export default function ContributionFlow() {
   const [type, setType] = useState<ContributionType | null>(null);
+
   const [guideContData, setGuideContData] = useState<GuideContribution>({
     type: "",
     title: "",
     summary: "",
     subjects: [],
+    newSubjects: [],
     prereqs: [],
     todoPrereqs: [],
   });
@@ -42,6 +42,14 @@ export default function ContributionFlow() {
         "mechanics-how-to-apply-newtons-laws",
       ],
       subObjectives: [],
+    });
+
+  const [objectiveContData, setObjectiveContData] =
+    useState<ObjectiveContribution>({
+      title: "",
+      summary: "",
+      target: [],
+      featured: "",
     });
 
   const StepperInstance = useMemo(() => {
@@ -144,10 +152,15 @@ function Inner({
           guideContData={guideContData}
           setGuideContData={setGuideContData}
         />
-        <VariantDetails Stepper={Stepper} />
-        <ObjectiveDetails Stepper={Stepper} />
 
-        <BaseGuide Stepper={Stepper} />
+        <VariantDetails Stepper={Stepper} />
+
+        <ObjectiveDetails
+          Stepper={Stepper}
+          objectiveContData={objectiveContData}
+          setObjectiveContData={setObjectiveContData}
+        />
+
         <Content Stepper={Stepper} />
         <SelectObjectiveGuides Stepper={Stepper} />
         <OrderObjectiveGuides
