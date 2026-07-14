@@ -10,20 +10,23 @@ type RateLimitOptions = {
 type Counter = { count: number; resetAt: number };
 
 interface RateLimiterStore {
-  hit(windowSeconds: number): Promise<Counter>;
+  hit(key: string, windowSeconds: number): Promise<Counter>;
 }
 
 // In-memory store used when no Durable Object binding is present (tests,
 // fresh `wrangler dev` before the DO migration runs). Counters are
 // process-scoped and reset on restart -- fine for local dev and test
 // suites. A singleton keeps middleware instances sharing the same
-// counters during test runs.
+// counters during test runs. Keyed on user+window so users never share a
+// counter -- mirrors the per-user isolation the DO path gets from
+// idFromName(key).
 function createInMemoryStore(): RateLimiterStore {
-  const counters = new Map<number, Counter>();
+  const counters = new Map<string, Counter>();
   return {
-    async hit(windowSeconds) {
+    async hit(key, windowSeconds) {
+      const storageKey = `${key}:${windowSeconds}`;
       const now = Math.floor(Date.now() / 1000);
-      const existing = counters.get(windowSeconds);
+      const existing = counters.get(storageKey);
       let counter: Counter;
       if (!existing || existing.resetAt <= now) {
         counter = { count: 1, resetAt: now + windowSeconds };
@@ -33,7 +36,7 @@ function createInMemoryStore(): RateLimiterStore {
           resetAt: existing.resetAt,
         };
       }
-      counters.set(windowSeconds, counter);
+      counters.set(storageKey, counter);
       return counter;
     },
   };
@@ -77,7 +80,7 @@ export function rateLimitMiddleware(
 
     const { count, resetAt } = c.env.RATE_LIMITER
       ? await hitDurableObject(c.env.RATE_LIMITER, key, options.windowSeconds)
-      : await inMemoryStore.hit(options.windowSeconds);
+      : await inMemoryStore.hit(key, options.windowSeconds);
 
     const remaining = Math.max(0, options.max - count);
     const now = Math.floor(Date.now() / 1000);
