@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import type { HydratedObjective, Level } from "@/types/objectives";
 
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { GuideCard } from "@/components/cards/GuideCard";
 
 import { getPathBySlug, hydrateObjectives } from "@/lib/getData";
@@ -32,6 +34,13 @@ function PathPage() {
   );
   const objective = hydratedObjectives[0];
 
+  const subObjectiveItems = [
+    { value: "", label: "Sub Objective" },
+    { value: slug, label: objective.title },
+  ];
+
+  const [subObjective, setSubObjective] = useState("");
+
   return (
     <div className="mx-auto max-w-[1280px] border-x bg-background">
       <section className="border-b px-8 py-8 lg:px-16">
@@ -42,38 +51,32 @@ function PathPage() {
           </h1>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9 rounded-full">
+            <Combobox
+              items={subObjectiveItems}
+              value={subObjective}
+              onValueChange={setSubObjective}
+            />
+
+            <Button variant="outline" size="sm">
               See Graph View
             </Button>
-
-            <select
-              aria-label="Sub Objective"
-              className="h-9 min-w-[140px] rounded-full border border-input bg-background px-3 text-sm text-foreground"
-            >
-              <option value="">Sub Objective</option>
-              <option value={slug}>{objective.title}</option>
-            </select>
           </div>
         </div>
 
         <Separator className="mb-4 bg-border" />
 
-        <ol className="m-0 flex w-full list-none flex-col gap-3 p-0">
+        <ol className="m-0 flex w-full list-none flex-col gap-3 p-0 sm:mt-8 md:mt-16 lg:mt-28">
           {objective.levels.map((level: Level, index: number) => {
             const g = {
               ...level.guide,
               stats: [{ label: "Duration", data: level.guide.duration }],
               actionBtns: (
                 <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
-                  <Button
-                    variant="outline"
-                    className="btn-sec h-10 rounded-full"
-                    size="lg"
-                  >
+                  <Button variant="outline" className="btn-sec" size="lg">
                     View Walkthrough
                   </Button>
 
-                  <Button className="btn-pri h-10 rounded-full" size="lg">
+                  <Button className="btn-pri" size="lg">
                     Read
                   </Button>
                 </div>
