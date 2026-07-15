@@ -31,7 +31,6 @@ import {
 } from "../services/variant.service";
 import {
   diffRevisions,
-  diffWithPrevious,
   getRevision,
   submitRevision,
   updateRevision,
@@ -231,15 +230,6 @@ export const guideRevisionsRouter = new Hono<HonoEnv>()
       c.req.param("id")
     );
     return c.json({ review_case_id }, 201);
-  })
-
-  // Returns the diff against the previous approved revision as { from, to, fields }.
-  .get("/:id/diff/prev", async (c) => {
-    const { from, to, fields } = await diffWithPrevious(
-      c.get("supabase"),
-      c.req.param("id")
-    );
-    return c.json({ from, to, fields });
   })
 
   // Returns the diff between two revisions as { from, to, fields }.
