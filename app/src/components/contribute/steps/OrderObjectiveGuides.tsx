@@ -306,7 +306,7 @@ export const OrderObjectiveGuides = ({
           {/* Left Pane: Curated Sequence */}
           <Card
             className={`flex h-full max-h-full flex-col overflow-hidden rounded-lg border border-border bg-card/35 shadow-none backdrop-blur-sm ${
-              isFullscreen ? "lg:col-span-4" : "lg:col-span-7"
+              isFullscreen ? "lg:col-span-4" : "lg:col-span-5"
             }`}
           >
             <CardHeader className="border-b pb-4">
@@ -552,7 +552,7 @@ export const OrderObjectiveGuides = ({
           {/* Right Pane: Generated Walkthrough by Level */}
           <Card
             className={`flex h-full max-h-full flex-col overflow-hidden rounded-lg border border-border bg-muted/10 shadow-none ${
-              isFullscreen ? "lg:col-span-8" : "lg:col-span-5"
+              isFullscreen ? "lg:col-span-8" : "lg:col-span-7"
             }`}
           >
             <CardHeader className="border-b pb-4">

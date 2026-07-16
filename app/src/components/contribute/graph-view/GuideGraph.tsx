@@ -260,7 +260,10 @@ export function GuideGraph({
           gap={24}
           size={2}
         />
-        <Controls className="overflow-hidden rounded-xl !border-border !bg-background !shadow-md [&>button]:!border-b-border [&>button]:!text-foreground hover:[&>button]:!bg-muted" />
+        <Controls
+          showInteractive={false}
+          className="overflow-hidden rounded-xl border-border! bg-background! shadow-md! [&>button]:border-b-border! [&>button]:text-foreground! hover:[&>button]:bg-muted!"
+        />
       </ReactFlow>
     </div>
   );
