@@ -41,13 +41,7 @@ export default function ContributionFlow({ type, setType }: PropTypes) {
     useState<ObjectiveContribution>({
       title: "",
       summary: "",
-      targets: [
-        "arithmetic-introduction",
-        "algebra-how-to-express-equations",
-        "calculus-introduction",
-        "vectors-introduction",
-        "mechanics-how-to-apply-newtons-laws",
-      ],
+      targets: [],
       featured: "",
       subObjectives: [],
     });
