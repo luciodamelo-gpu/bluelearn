@@ -65,7 +65,7 @@ function PathPage() {
 
         <Separator className="mb-4 bg-border" />
 
-        <ol className="m-0 flex w-full list-none flex-col gap-3 p-0 sm:mt-8 md:mt-16 lg:mt-28">
+        <ol className="m-0 flex w-full list-none flex-col gap-3 p-0 sm:m-8 md:m-16 lg:m-28">
           {objective.levels.map((level: Level, index: number) => {
             const g = {
               ...level.guide,
