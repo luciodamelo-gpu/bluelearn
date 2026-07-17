@@ -30,7 +30,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import guidesData from "@/data/blueguides.json";
+import guidesData from "@/data/guides.json";
 
 // Map for O(1) guide lookup
 const guidesMap = new Map(guidesData.map((g) => [g.slug, g]));
