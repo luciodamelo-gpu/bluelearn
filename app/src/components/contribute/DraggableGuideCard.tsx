@@ -61,33 +61,33 @@ export const DraggableGuideCard = ({
           </div>
           {/* Author, Date, & Duration under title, before description */}
           {(guide.author || guide.created_at || guide.duration) && (
-            <div className="mt-1 ml-8 flex flex-wrap items-center gap-2.5 text-[10px] text-muted-foreground/80">
+            <div className="mt-1 ml-7 flex flex-wrap items-center gap-2.5 text-[10px] text-muted-foreground/80">
               {guide.author && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 font-mono uppercase">
                   <User className="h-3 w-3 text-muted-foreground/75" />@
                   {guide.author}
                 </span>
               )}
               {guide.created_at && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 font-mono uppercase">
                   <Calendar className="h-3 w-3 text-muted-foreground/75" />
                   {guide.created_at}
                 </span>
               )}
               {guide.duration && (
-                <span className="flex items-center gap-1 font-medium">
+                <span className="flex items-center gap-1 font-mono font-medium uppercase">
                   <Clock className="h-3 w-3 text-muted-foreground/75" />
                   {guide.duration}m
                 </span>
               )}
             </div>
           )}
-          <p className="mt-1.5 ml-8 text-xs text-muted-foreground">
+          <p className="mt-1.5 ml-7 text-xs text-muted-foreground">
             {guide.summary}
           </p>
           {/* Tags below description */}
           {guide.tags.length > 0 && (
-            <div className="mt-2 ml-8 flex flex-wrap gap-1">
+            <div className="mt-2 ml-7 flex flex-wrap gap-1">
               {guide.tags.map((tag) => (
                 <Badge
                   key={tag}
