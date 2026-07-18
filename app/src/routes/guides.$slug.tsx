@@ -175,12 +175,6 @@ function RouteComponent() {
               <Button variant="ghost" size="icon">
                 <Flag className="h-4 w-4" />
               </Button>
-
-              <select className="h-8 rounded-md border bg-background px-2 text-xs">
-                <option>EN</option>
-                <option>FR</option>
-                <option>DE</option>
-              </select>
             </div>
           </div>
 
