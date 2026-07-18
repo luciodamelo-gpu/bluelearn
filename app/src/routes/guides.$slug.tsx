@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Link,
   createFileRoute,
@@ -12,6 +12,7 @@ import {
   House,
   Pencil,
   Plus,
+  Replace,
 } from "lucide-react";
 
 import type { GuideReference, HydratedGuide } from "@/types/guides";
@@ -48,6 +49,8 @@ function RouteComponent() {
     select: (location) => location.state.breadcrumbOrigin,
   });
 
+  const [vote, setVote] = useState<string | null>(null);
+
   const guide = getGuideBySlug(guides, slug);
 
   if (!guide) {
@@ -77,6 +80,20 @@ function RouteComponent() {
     <div className="mx-auto h-[calc(100vh-70px)] max-w-[1280px] border-x bg-background">
       <section className="grid grid-cols-[320px_1fr] border-b">
         <Sidebar>
+          <div className="flex items-center justify-start gap-4">
+            <Button variant="outline" size="lg" onClick={() => {}}>
+              <Replace className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => {}}>
+              <Replace className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => {}}>
+              <Replace className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => {}}>
+              <Replace className="h-4 w-4" />
+            </Button>
+          </div>
           {/* Prerequisites */}
           <CollapsibleSection
             title={<p className="ml-auto">Prerequisites</p>}
@@ -185,16 +202,40 @@ function RouteComponent() {
                 View Walkthrough
               </Button>
 
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => {
+                  if (vote == "up") {
+                    setVote(null);
+                  } else {
+                    setVote("up");
+                  }
+                }}
+              >
                 <ArrowBigUp
                   className="h-4 w-4"
-                  color="#3D80DD"
-                  fill="#3D80DD"
+                  color={vote == "up" ? "#3D80DD" : "#000000"}
+                  fill={vote == "up" ? "#3D80DD" : "#FFFFFF"}
                 />
               </Button>
 
-              <Button variant="ghost" size="icon">
-                <ArrowBigDown className="h-4 w-4" />
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => {
+                  if (vote == "down") {
+                    setVote(null);
+                  } else {
+                    setVote("down");
+                  }
+                }}
+              >
+                <ArrowBigDown
+                  className="h-4 w-4"
+                  color={vote == "down" ? "#3D80DD" : "#000000"}
+                  fill={vote == "down" ? "#3D80DD" : "#FFFFFF"}
+                />
               </Button>
 
               <DropdownMenu>
