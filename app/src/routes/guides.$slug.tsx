@@ -155,14 +155,6 @@ function RouteComponent() {
               ))}
             </ul>
           </CollapsibleSection>
-
-          {/* Variants */}
-          <CollapsibleSection
-            title={<p className="ml-auto">Variants</p>}
-            defaultOpen={true}
-          >
-            <ul className="space-y-2"></ul>
-          </CollapsibleSection>
         </Sidebar>
 
         {/* MAIN */}
