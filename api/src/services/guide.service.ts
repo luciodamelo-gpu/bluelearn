@@ -280,11 +280,7 @@ export async function listGuideVariants(supabase: DB, rawSlug: string) {
     throw new ServiceError("Failed to load variants", 500);
   }
 
-  return (data ?? []).map(({ title, summary, ...variant }) => ({
-    ...variant,
-    title: title ?? null,
-    summary: summary ?? null,
-  }));
+  return data ?? [];
 }
 
 // Add a variant under a guide: a draft guide + first revision via the

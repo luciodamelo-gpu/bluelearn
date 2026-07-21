@@ -34,4 +34,4 @@ as $$
 $$;
 
 grant execute on function public.list_guide_variants_by_score(uuid, double precision)
-  to authenticated, service_role;
+  to anon, authenticated, service_role;
